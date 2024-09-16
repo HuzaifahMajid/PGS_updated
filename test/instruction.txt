@@ -1,0 +1,82 @@
+1) go to https://iapps.courts.state.ny.us/nyscef/CaseSearch?TAB=name
+2) search desired business name
+3) press F12 on keyboard  and go to console tab to enter the following code:
+
+{
+
+
+let table = document.querySelector('table.NewSearchResults');
+
+// Initialize an array to hold the row data
+let rowData = [];
+
+// Check if the table exists
+if (table) {
+    // Select the first 24 rows in the table's body
+    let rows = table.querySelectorAll('tbody tr');
+
+    // Loop through the first 24 rows
+    for (let i = 0; i < Math.min(rows.length, 24); i++) {
+        // Get all columns (cells) of each row
+        let columns = rows[i].querySelectorAll('td');
+
+        // Initialize an array to hold the column data
+        let columnData = [];
+
+        // Loop through all columns in the current row
+        for (let j = 0; j < columns.length; j++) {
+            let textContent = columns[j].textContent.trim();
+
+            // Check if it's the first column and if it contains a hyperlink
+            if (j === 0) {
+                let link = columns[j].querySelector('a');
+                let linkHref = link ? link.href : '';
+
+                // Format the output string for the first column
+                if (linkHref) {
+                    textContent += ` (Link: ${linkHref})`;
+                }
+            }
+
+            // Add the text content of the column to columnData
+            columnData.push(textContent);
+        }
+
+        // Join all columns' data for the current row and add it to rowData
+        rowData.push(columnData.join(' | '));
+    }
+
+    // Join the rowData array into a single string with line breaks
+    let fileContent = rowData.join('\n');
+
+    // Create a Blob from the file content
+    let blob = new Blob([fileContent], { type: 'text/plain' });
+    
+    // Create a link element
+    let link = document.createElement('a');
+    
+    // Set the download attribute with a filename
+    link.download = 'table_data.txt';
+    
+    // Create a URL for the Blob and set it as the href attribute
+    link.href = window.URL.createObjectURL(blob);
+    
+    // Append the link to the body
+    document.body.appendChild(link);
+    
+    // Programmatically click the link to trigger the download
+    link.click();
+    
+    // Remove the link from the document
+    document.body.removeChild(link);
+} else {
+    console.log('Table not found.');
+}
+
+
+
+}
+
+4) copy the files contents in the desired location to run this program
+
+5)run script
